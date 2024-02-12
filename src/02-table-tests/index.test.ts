@@ -32,7 +32,8 @@ const testCases = [
 describe('simpleCalculator', () => {
   testCases.forEach(({ a, b, action, expected }) => {
     test(`should return ${expected} for ${action} operation with ${a} and ${b}`, () => {
-      const result = simpleCalculator({ a, b, action });
+      const input = { a, b, action };
+      const result = simpleCalculator(input);
       expect(result).toBe(expected);
     });
   });
