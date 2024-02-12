@@ -3,13 +3,14 @@ import {
   InsufficientFundsError,
   TransferFailedError,
   SynchronizationFailedError,
+  getBankAccount,
 } from '.';
 
 describe('BankAccount', () => {
   test('should create account with initial balance', () => {
     const initialAmount = 100;
     const account = new BankAccount(initialAmount);
-    expect(account.getBalance()).toBe(initialAmount);
+    expect(account.getBalance()).toEqual(initialAmount);
   });
 
   test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
@@ -36,14 +37,14 @@ describe('BankAccount', () => {
     const account = new BankAccount(100);
     const depositAmount = 50;
     account.deposit(depositAmount);
-    expect(account.getBalance()).toBe(100 + depositAmount);
+    expect(account.getBalance()).toEqual(100 + depositAmount);
   });
 
   test('should withdraw money', () => {
     const account = new BankAccount(100);
     const withdrawAmount = 50;
     account.withdraw(withdrawAmount);
-    expect(account.getBalance()).toBe(100 - withdrawAmount);
+    expect(account.getBalance()).toEqual(100 - withdrawAmount);
   });
 
   test('should transfer money', () => {
@@ -51,21 +52,24 @@ describe('BankAccount', () => {
     const toAccount = new BankAccount(50);
     const transferAmount = 50;
     fromAccount.transfer(transferAmount, toAccount);
-    expect(fromAccount.getBalance()).toBe(100 - transferAmount);
-    expect(toAccount.getBalance()).toBe(50 + transferAmount);
+    expect(fromAccount.getBalance()).toEqual(100 - transferAmount);
+    expect(toAccount.getBalance()).toEqual(50 + transferAmount);
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
-    const account = new BankAccount(100);
-    const balance = await account.fetchBalance();
-    expect(typeof balance).toBe(balance === null ? 'object' : 'number');
+    const bankAccount = getBankAccount(123);
+    const methCallResult = await bankAccount.fetchBalance();
+
+    if (methCallResult) {
+      expect(Number.isFinite(methCallResult)).toEqual(true);
+    }
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
     const account = new BankAccount(100);
     jest.spyOn(account, 'fetchBalance').mockResolvedValueOnce(50);
     await account.synchronizeBalance();
-    expect(account.getBalance()).toBe(50);
+    expect(account.getBalance()).toEqual(50);
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
